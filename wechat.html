@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>公众号数据驾驶舱 · 浙江华数</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="xhs-unified.css?v=20260821-9">
+<link rel="stylesheet" href="douyin.css">
+<link rel="stylesheet" href="douyin-responsive.css">
+<link rel="stylesheet" href="wechat.css?v=20260901-layout3">
+<link rel="stylesheet" href="wechat-responsive.css?v=20260901-data1">
+</head>
+<body>
+<div class="app">
+<aside>
+<div class="brand">
+<img src="logo-wasu.png" class="brandLogo" alt="华数">
+<span class="brandText">浙江华数公众号<br>数据驾驶舱</span>
+</div>
+<nav>
+<button class="selected" data-target="wx-overview">
+<svg viewBox="0 0 24 24">
+<rect x="3" y="3" width="7" height="9"/>
+<rect x="14" y="3" width="7" height="5"/>
+<rect x="14" y="12" width="7" height="9"/>
+<rect x="3" y="16" width="7" height="5"/>
+</svg>数据总览</button>
+<button data-target="wx-trend-section">
+<svg viewBox="0 0 24 24">
+<path d="M3 3v18h18M7 15l4-5 3 3 4-6"/>
+</svg>年度趋势</button>
+<button data-target="wx-content">
+<svg viewBox="0 0 24 24">
+<path d="M3 3h18v18H3M3 9h18M9 3v18"/>
+</svg>内容表现</button>
+</nav>
+</aside>
+<main>
+<header>
+<div class="account">
+<img src="logo-wechat.svg" class="dyHeaderLogo" alt="公众号">
+<span class="dyHeaderText">运营数据</span>
+</div>
+</header>
+<div class="page">
+<div class="titleRow">
+<h1>公众号数据总览</h1>
+</div>
+<div class="platformRail">
+<a href="index.html">视频号</a>
+<a href="xiaohongshu.html">小红书</a>
+<a href="douyin.html">抖音号</a>
+<a class="active" href="wechat.html">公众号</a>
+</div>
+<section id="wx-overview">
+<div class="xhsMetrics" id="wxMetrics">
+</div>
+<div class="xhsGrid">
+<div class="panel xhsChart">
+<div class="panelHead">
+<h2>阅读趋势</h2>
+<span id="wxDateRange">
+</span>
+</div>
+<div id="wxTrend" class="dyChartCanvas">
+</div>
+</div>
+<div class="panel xhsTop" id="wx-top-section">
+<div class="panelHead">
+<h2>数据 TOP 内容</h2>
+<span>按阅读量</span>
+</div>
+<div class="xhsTopList" id="wxTopList">
+</div>
+</div>
+</div>
+</section>
+<section id="wx-trend-section">
+<div class="panel yearPanel">
+<div class="panelHead">
+<h2>年度阅读趋势</h2>
+<div class="yearHeadActions">
+<select id="wxYear">
+<option value="all">三年对比</option>
+<option value="2026">2026年</option>
+<option value="2025">2025年</option>
+<option value="2024">2024年</option>
+</select>
+</div>
+</div>
+<div id="wxYearChart" class="dyYearCanvas">
+</div>
+</div>
+</section>
+<section id="wx-content">
+<div class="panel xhsTable wxTable">
+<div class="panelHead">
+<h2>内容表现</h2>
+<span id="wxCount">
+</span>
+</div>
+<div class="xhsFilters">
+<div class="seg" id="wxFilterSeg">
+<button class="on" data-f="all">全部时间</button>
+<button data-f="30">近30天</button>
+<button data-f="month">本月</button>
+</div>
+<label class="xhsSearchField">搜索 <input id="wxSearch" placeholder="内容关键词">
+</label>
+<label class="xhsSortField">排序 <select id="wxSort">
+<option value="timeDesc">时间降序</option>
+<option value="timeAsc">时间升序</option>
+<option value="readDesc" selected>阅读量降序</option>
+<option value="readAsc">阅读量升序</option>
+</select>
+</label>
+</div>
+<div class="tableWrap">
+<table>
+<thead>
+<tr>
+<th>内容</th>
+<th>发布日期</th>
+<th>阅读量</th>
+<th>互动量</th>
+<th>点赞</th>
+<th>分享</th>
+<th>收藏</th>
+<th>评论</th>
+</tr>
+</thead>
+<tbody id="wxBody">
+</tbody>
+</table>
+</div>
+<div class="xhsPager" id="wxPager">
+</div>
+</div>
+</section>
+</div>
+</main>
+</div>
+<script src="echarts.min.js">
+</script>
+<script src="wechat-data.js?v=20260901-data1">
+</script>
+<script src="wechat-app.js?v=20260901-layout3">
+</script>
+<script src="platform-trend-modal.js?v=20260821-1">
+</script>
+<script src="platform-top-modal.js?v=20260821-1">
+</script>
+<script src="platform-nav-scroll.js?v=20260821-7">
+</script>
+</body>
+</html>
+

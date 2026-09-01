@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>小红书数据驾驶舱 · 浙江华数</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="xhs-unified.css?v=20260821-9">
+<style>
+:root{--accent:#7b668f;--accent-soft:#f2edf6}body{background:#f5f5f7;color:#1d1d1f}main,.page{background:#f5f5f7}.page{max-width:1700px}aside{background:rgba(250,250,252,.94);border-right-color:#e5e5e7}.brand{flex-direction:column;justify-content:center;min-height:150px;height:auto;padding:16px;gap:10px}.brandLogo{width:84px}.brandText{text-align:center;font-size:18px;line-height:1.3}nav button.selected{color:var(--accent);background:var(--accent-soft)}nav button svg{fill:currentColor}.account{font-size:18px}.videoIcon{height:40px}.platformRail{display:flex;gap:4px;margin:-2px 0 16px;padding:4px;width:max-content;max-width:100%;overflow-x:auto;border:1px solid #dedee3;border-radius:12px;background:#eeeef1;scrollbar-width:none}.platformRail::-webkit-scrollbar{display:none}.platformRail a,.platformRail span{flex:none;padding:8px 14px;border-radius:9px;color:#6e6e73;font-size:13px;text-decoration:none}.platformRail .active{color:#1d1d1f;background:#fff;box-shadow:0 1px 5px rgba(0,0,0,.12);font-weight:650}.platformRail .soon{opacity:.48}
+.xhsMetrics{display:grid;grid-template-columns:repeat(4,1fr);margin-bottom:16px;border:1px solid #e5e5e7;border-radius:14px;background:#fff;box-shadow:0 8px 24px rgba(0,0,0,.04)}.xhsMetric{padding:20px 24px;text-align:center;border-right:1px solid #ededf0}.xhsMetric:last-child{border:0}.xhsMetric span{display:block;color:#6e6e73;font-size:13px}.xhsMetric strong{display:block;margin:8px 0 4px;font-size:28px}.xhsMetric small{color:#92929a;font-size:11px}.xhsGrid{display:grid;grid-template-columns:minmax(420px,1fr) minmax(560px,1.35fr);gap:16px}.panel{background:#fff;border-color:#e5e5e7;box-shadow:0 8px 24px rgba(0,0,0,.04)}.xhsChart,.xhsTop{height:420px;display:flex;flex-direction:column}.xhsTopList{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;padding:10px;overflow:auto}.xhsTopCard{display:grid;grid-template-columns:22px 58px 1fr auto;gap:9px;align-items:center;min-width:0;padding:9px;border:1px solid #e8e8ec;border-radius:12px}.xhsTopRank{color:#aaaab2;font-weight:800;text-align:center}.xhsTopCard:nth-child(-n+3) .xhsTopRank{color:var(--accent)}.xhsTopCover{width:58px;height:78px;object-fit:contain;border-radius:8px;background:#f3f3f5}.xhsTopInfo{min-width:0}.xhsTopTitle{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:12px;font-weight:650;line-height:1.4}.xhsTopDate{margin-top:5px;color:#92929a;font-size:10px}.xhsTopViews{text-align:right;color:var(--accent);font-size:15px;font-weight:800}.xhsTopViews small{display:block;color:#999;font-size:9px;font-weight:500}.yearPanel,.xhsTable{margin-top:16px}.yearHeadActions{display:flex;align-items:center;gap:10px}.yearHeadActions select,.xhsFilters select{height:34px;border:1px solid #d9d9de;border-radius:8px;background:#fff;padding:0 10px}.xhsFilters{display:flex;gap:8px;padding:10px 14px;border-bottom:1px solid #ededf0}.xhsFilters input{width:220px;height:36px;padding:0 12px;border:1px solid #d9d9de;border-radius:9px;outline:0}.xhsTable table{min-width:1100px}.xhsTable tbody td{height:104px}.xhsCell{display:flex;align-items:center;gap:12px;min-width:420px}.xhsCover{width:68px;height:88px;object-fit:contain;border-radius:8px;background:#f3f3f5}.xhsTitle{max-width:390px;white-space:normal;font-size:14px;font-weight:600;line-height:1.45}.xhsPager{display:flex;justify-content:center;gap:6px;padding:12px}.xhsPager button{min-width:32px;height:32px;border:1px solid #dedee3;border-radius:8px;background:#fff}.xhsPager button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+@media(max-width:900px){.xhsGrid{grid-template-columns:1fr}.xhsMetrics{grid-template-columns:repeat(2,1fr)}.xhsMetric:nth-child(2){border-right:0}.xhsMetric:nth-child(-n+2){border-bottom:1px solid #ededf0}}
+@media(max-width:760px){body{padding-bottom:72px}aside{inset:auto 8px 8px;width:auto;height:62px;transform:none;border:1px solid #dddde2;border-radius:18px;background:rgba(255,255,255,.9);box-shadow:0 10px 35px rgba(0,0,0,.13);backdrop-filter:blur(18px)}aside .brand{display:none}aside nav{display:grid;grid-template-columns:repeat(4,1fr);height:100%;padding:5px}aside nav button{flex-direction:column;justify-content:center;gap:2px;height:50px;padding:0 4px;font-size:10px;text-align:center}aside nav button svg{width:18px;height:18px}main{width:100%;margin:0}header{height:56px;padding:0 14px}.actions{display:none}.page{padding:14px 12px 28px}.titleRow h1{font-size:23px}.platformRail{width:100%;margin-bottom:12px}.platformRail a,.platformRail span{flex:1;padding:8px;text-align:center;font-size:12px}.xhsMetrics{grid-template-columns:repeat(2,1fr);gap:8px;border:0;background:transparent;box-shadow:none}.xhsMetric{min-height:108px;padding:14px 8px;border:1px solid #e5e5e9!important;border-radius:14px;background:#fff}.xhsMetric strong{font-size:21px}.xhsGrid{display:block}.panel{margin-bottom:12px;border-radius:15px}.xhsChart,.xhsTop{height:auto}.panelHead{min-height:54px;height:auto;padding:10px 13px}.panelHead h2{font-size:17px}.xhsTopList{grid-template-columns:1fr;overflow:visible}.xhsTopCard{grid-template-columns:20px 54px 1fr auto}.xhsTopCover{width:54px;height:72px}#xhsTrend,#xhsYearChart{height:250px!important}.yearHeadActions span{display:none}.xhsFilters{display:grid;grid-template-columns:1fr auto}.xhsFilters input{width:100%;min-width:0}.tableWrap{overflow:visible}.xhsTable table{display:block;min-width:0}.xhsTable thead{display:none}.xhsTable tbody{display:grid;gap:8px;padding:8px}.xhsTable tr{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;padding:12px;border:1px solid #e7e7eb;border-radius:14px}.xhsTable td{display:block;height:auto!important;padding:0;border:0;text-align:left!important}.xhsTable td:first-child{grid-column:1/-1}.xhsCell{min-width:0;align-items:flex-start}.xhsCover{width:64px;height:84px}.xhsTitle{font-size:13px}.xhsTable td:not(:first-child)::before{display:block;margin-bottom:2px;color:#92929a;font-size:9px}.xhsTable td:nth-child(2)::before{content:'发布时间'}.xhsTable td:nth-child(3)::before{content:'阅读量'}.xhsTable td:nth-child(4)::before{content:'互动量'}.xhsTable td:nth-child(5)::before{content:'评论'}.xhsTable td:nth-child(6)::before{content:'点赞'}.xhsTable td:nth-child(7)::before{content:'收藏'}.xhsTable td:nth-child(8)::before{content:'分享'}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside>
+<div class="brand">
+<img src="logo-wasu.png" class="brandLogo" alt="华数">
+<span class="brandText">浙江华数小红书<br>数据驾驶舱</span>
+</div>
+<nav>
+<button class="selected" data-target="xhs-overview">
+<svg viewBox="0 0 24 24">
+<rect x="3" y="3" width="7" height="9"/>
+<rect x="14" y="3" width="7" height="5"/>
+<rect x="14" y="12" width="7" height="9"/>
+<rect x="3" y="16" width="7" height="5"/>
+</svg>数据总览</button>
+<button data-target="xhs-trend-section">
+<svg viewBox="0 0 24 24">
+<path d="M3 3v18h18M7 15l4-5 3 3 4-6"/>
+</svg>年度趋势</button>
+<button data-target="xhs-top-section">
+<svg viewBox="0 0 24 24">
+<path d="M4 19V9m6 10V4m6 15v-7m4 7H2"/>
+</svg>TOP内容</button>
+<button data-target="xhs-content">
+<svg viewBox="0 0 24 24">
+<path d="M3 3h18v18H3M3 9h18M9 3v18"/>
+</svg>内容表现</button>
+</nav>
+</aside>
+<main>
+<header>
+<div class="account">
+<img src="logo-video.png" class="videoIcon" alt="">运营数据</div>
+</header>
+<div class="page">
+<div class="titleRow">
+<h1>小红书数据总览</h1>
+</div>
+<div class="platformRail">
+<a href="index.html">视频号</a>
+<a class="active" href="xiaohongshu.html">小红书</a>
+<span class="soon">抖音号</span>
+<span class="soon">公众号</span>
+</div>
+<section id="xhs-overview">
+<div class="xhsMetrics" id="xhsMetrics">
+</div>
+<div class="xhsGrid">
+<div class="panel xhsChart">
+<div class="panelHead">
+<h2>阅读趋势</h2>
+<span id="xhsDateRange">
+</span>
+</div>
+<div id="xhsTrend" style="width:100%;flex:1;min-height:280px">
+</div>
+</div>
+<div class="panel xhsTop" id="xhs-top-section">
+<div class="panelHead">
+<h2>数据 TOP 内容</h2>
+<span>按阅读量</span>
+</div>
+<div class="xhsTopList" id="xhsTopList">
+</div>
+</div>
+</div>
+</section>
+<section id="xhs-trend-section">
+<div class="panel yearPanel">
+<div class="panelHead">
+<h2>年度阅读趋势</h2>
+<div class="yearHeadActions">
+<span>按发布日期归入对应年份</span>
+<select id="xhsYear">
+<option value="all">历年对比</option>
+<option value="2026">2026年</option>
+<option value="2025">2025年</option>
+<option value="2024">2024年</option>
+<option value="2023">2023年</option>
+</select>
+</div>
+</div>
+<div id="xhsYearChart" style="width:100%;height:300px">
+</div>
+</div>
+</section>
+<section id="xhs-content">
+<div class="panel xhsTable">
+<div class="panelHead">
+<h2>内容表现</h2>
+<span id="xhsCount">
+</span>
+</div>
+<div class="xhsFilters">
+<input id="xhsSearch" placeholder="搜索标题关键词">
+<select id="xhsFilterYear">
+<option value="all">全部年份</option>
+<option>2026</option>
+<option>2025</option>
+<option>2024</option>
+<option>2023</option>
+</select>
+</div>
+<div class="tableWrap">
+<table>
+<thead>
+<tr>
+<th>内容</th>
+<th>发布时间</th>
+<th>阅读量</th>
+<th>互动量</th>
+<th>评论</th>
+<th>点赞</th>
+<th>收藏</th>
+<th>分享</th>
+</tr>
+</thead>
+<tbody id="xhsBody">
+</tbody>
+</table>
+</div>
+<div class="xhsPager" id="xhsPager">
+</div>
+</div>
+</section>
+</div>
+</main>
+</div>
+<script src="echarts.min.js">
+</script>
+<script src="xhs-data.js?v=20260901-data1">
+</script>
+<script src="xhs-app.js?v=20260901-data1">
+</script>
+<script src="platform-trend-modal.js?v=20260821-1">
+</script>
+<script src="platform-top-modal.js?v=20260821-1">
+</script>
+<script src="platform-nav-scroll.js?v=20260821-7">
+</script>
+</body>
+</html>
+

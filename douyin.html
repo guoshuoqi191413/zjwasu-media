@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>抖音号数据驾驶舱 · 浙江华数</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="xhs-unified.css?v=20260821-9">
+  <link rel="stylesheet" href="douyin.css">
+  <link rel="stylesheet" href="douyin-responsive.css">
+  <link rel="stylesheet" href="mobile-content-compact.css?v=20260821-7">
+</head>
+<body>
+<div class="app">
+  <aside>
+    <div class="brand"><img src="logo-wasu.png" class="brandLogo" alt="华数"><span class="brandText">浙江华数抖音号<br>数据驾驶舱</span></div>
+    <nav>
+      <button class="selected" data-target="dy-overview"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>数据总览</button>
+      <button data-target="dy-trend-section"><svg viewBox="0 0 24 24"><path d="M3 3v18h18M7 15l4-5 3 3 4-6"/></svg>年度趋势</button>
+      <button data-target="dy-content"><svg viewBox="0 0 24 24"><path d="M3 3h18v18H3M3 9h18M9 3v18"/></svg>内容表现</button>
+    </nav>
+  </aside>
+  <main>
+    <header><div class="account"><img src="logo-douyin.svg" class="dyHeaderLogo" alt="抖音号"><span class="dyHeaderText">运营数据</span></div></header>
+    <div class="page">
+      <div class="titleRow"><h1>抖音号数据总览</h1></div>
+      <div class="platformRail"><a href="index.html">视频号</a><a href="xiaohongshu.html">小红书</a><a class="active" href="douyin.html">抖音号</a><a href="wechat.html">公众号</a></div>
+      <section id="dy-overview">
+        <div class="xhsMetrics" id="dyMetrics"></div>
+        <div class="xhsGrid">
+          <div class="panel xhsChart"><div class="panelHead"><h2>播放趋势</h2><span id="dyDateRange"></span></div><div id="dyTrend" class="dyChartCanvas"></div></div>
+          <div class="panel xhsTop" id="dy-top-section"><div class="panelHead"><h2>数据 TOP 内容</h2><span>按播放量</span></div><div class="xhsTopList" id="dyTopList"></div></div>
+        </div>
+      </section>
+      <section id="dy-trend-section">
+        <div class="panel yearPanel"><div class="panelHead"><h2>年度播放趋势</h2><div class="yearHeadActions"><select id="dyYear"><option value="all">历年对比</option><option value="2026">2026年</option><option value="2025">2025年</option><option value="2024">2024年</option><option value="2023">2023年</option><option value="2022">2022年</option></select></div></div><div id="dyYearChart" class="dyYearCanvas"></div></div>
+      </section>
+      <section id="dy-content">
+        <div class="panel xhsTable dyTable">
+          <div class="panelHead"><h2>内容表现</h2><span id="dyCount"></span></div>
+          <div class="xhsFilters"><div class="seg" id="dyFilterSeg"><button class="on" data-f="all">全部时间</button><button data-f="30">近30天</button><button data-f="month">本月</button></div><label class="xhsSearchField">搜索 <input id="dySearch" placeholder="内容关键词"></label><label class="xhsSortField">排序 <select id="dySort"><option value="timeDesc">时间降序</option><option value="timeAsc">时间升序</option><option value="playDesc" selected>播放量降序</option><option value="playAsc">播放量升序</option></select></label></div>
+          <div class="tableWrap"><table><thead><tr><th>内容</th><th>发布时间</th><th>完播率</th><th>5秒完播率</th><th>2秒跳出率</th><th>平均播放时长</th><th>播放量</th><th>点赞</th><th>评论</th><th>分享</th><th>收藏</th><th>主页访问</th><th>粉丝增量</th></tr></thead><tbody id="dyBody"></tbody></table></div>
+          <div class="xhsPager" id="dyPager"></div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+<script src="echarts.min.js"></script><script src="douyin-data.js?v=20260901-data1"></script><script src="douyin-app.js?v=20260901-data1"></script><script src="platform-trend-modal.js?v=20260821-1"></script><script src="platform-top-modal.js?v=20260821-1"></script>
+<script src="platform-nav-scroll.js?v=20260821-7"></script></body>
+</html>

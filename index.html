@@ -1,0 +1,502 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>数据总览 · 华数视频号</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* 两栏等高：左播放趋势 / 右 TOP 视频（延伸至右侧整列） */
+    .grid { grid-template-rows: auto; align-items: stretch; grid-template-columns: minmax(420px,1fr) minmax(560px,1.35fr); }
+    .grid > .chart, .grid > .topVideos {
+      height: auto;
+      min-height: 420px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* 互动 TOP 视频面板：2 列 × 3 行 */
+    .topVideos { display: flex; flex-direction: column; }
+    .topVList { flex: 1; overflow-y: auto; padding: 10px 14px 12px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; align-content: start; }
+    .topVList::-webkit-scrollbar { width: 4px; }
+    .topVList::-webkit-scrollbar-thumb { background: #d0d5d1; border-radius: 3px; }
+    .topVCard { display: flex; gap: 10px; align-items: center; min-height: 126px; padding: 10px; border-radius: 12px; border: 1px solid #e5e5e7; background: linear-gradient(145deg,#fff,#fafafa); box-shadow: 0 3px 10px rgba(0,0,0,.035); transition: transform .15s, box-shadow .15s; }
+    .topVCard:hover { transform: translateY(-2px); box-shadow: 0 8px 18px rgba(0,0,0,.08); }
+    .topVCard:hover { background: #f2f6f3; }
+    .topVRank { font-size: 18px; font-weight: 800; color: #c4c9c5; min-width: 24px; text-align: center; }
+    .topVCard:nth-child(1) .topVRank { color: #ef4b43; }
+    .topVCard:nth-child(2) .topVRank { color: #f3a806; }
+    .topVCard:nth-child(3) .topVRank { color: #3478ed; }
+    .topVCover { width: 58px; height: 78px; border-radius: 8px; object-fit: contain; flex: none; background: #f1f1f3; box-shadow: 0 1px 4px rgba(0,0,0,.12); }
+    .topVInfo { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 4px; }
+    .topVTitle { font-size: 12px; font-weight: 650; color: #1d1d1f; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .topVDate { font-size: 11px; color: #9ca39e; }
+    .topVStats { display: flex; gap: 10px; margin-top: 2px; }
+    .topVStat { font-size: 11px; color: #6a726c; }
+    .topVStat b { color: #545bc5; font-weight: 700; }
+    .topVTotal { font-size: 15px; font-weight: 800; color: #545bc5; white-space: nowrap; text-align: right; line-height: 1.15; }
+    .topVUnit { display: block; font-size: 10px; font-weight: 500; color: #9ca39e; margin-top: 1px; }
+    .chartHeadActions { display: inline-flex; align-items: center; gap: 10px; }
+    .expandChartBtn { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: 1px solid #d9d9de; border-radius: 9px; background: #fff; color: #6e6e73; }
+    .expandChartBtn:hover { color: #5e6ad2; background: #f5f5f7; }
+    .expandChartBtn svg { width: 16px; height: 16px; }
+    .chartModal { position: fixed; inset: 0; z-index: 20; display: none; align-items: center; justify-content: center; padding: 5vh 6vw; background: rgba(20,20,24,.2); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+    .chartModal.open { display: flex; }
+    .chartModalCard { width: min(1100px, 92vw); height: min(720px, 84vh); padding: 18px 22px 22px; border: 1px solid rgba(255,255,255,.7); border-radius: 22px; background: rgba(255,255,255,.86); box-shadow: 0 25px 80px rgba(0,0,0,.2); }
+    .chartModalHead { display: flex; align-items: center; justify-content: space-between; height: 42px; }
+    .chartModalHead h2 { margin: 0; font-size: 20px; }
+    .closeChartBtn { width: 32px; height: 32px; border-radius: 50%; background: #f1f1f3; font-size: 20px; color: #6e6e73; }
+    .closeChartBtn:hover { background: #e5e5e7; color: #1d1d1f; }
+    #yearChartModal { width: 100%; height: calc(100% - 42px); }
+    .filters label select, .filters label input { font: 12px inherit; }
+    .date svg { width: 15px; vertical-align: -2px; }
+    .brand { flex-direction: column; align-items: center; justify-content: center; height: auto; min-height: 150px; padding: 16px; gap: 10px; }
+    .brandLogo { height: 111px; width: 84px; max-width: 84px; object-fit: contain; flex: none; }
+    .navMapIcon { width: 24px; height: 24px; object-fit: cover; object-position: center; border-radius: 5px; flex: none; }
+    .navMapIcon { filter: saturate(1.35) contrast(1.08) brightness(.88) hue-rotate(8deg); }
+    .brandText { font-size: 18px; line-height: 1.3; font-weight: 800; letter-spacing: .5px; text-align: center; }
+    .account { font-size: 18px; }
+    .videoIcon { height: 44px; width: auto; max-width: 160px; object-fit: contain; flex: none; }
+    .platformRail { display:flex; align-items:center; gap:4px; margin:-2px 0 16px; padding:4px; width:max-content; max-width:100%; overflow-x:auto; border:1px solid #dedee3; border-radius:12px; background:#eeeef1; scrollbar-width:none; }
+    .platformRail::-webkit-scrollbar { display:none; }
+    .platformRail a,.platformRail span { flex:none; padding:8px 14px; border-radius:9px; color:#6e6e73; font-size:13px; text-decoration:none; }
+    .platformRail .active { color:#1d1d1f; background:#fff; box-shadow:0 1px 5px rgba(0,0,0,.12); font-weight:650; }
+    .platformRail .soon { opacity:.48; }
+
+    /* 内容表现表格区域：全部字号加大两号 */
+    .contentHead h2 { font-size: 22px; }
+    .contentHead > div p,
+    .contentHead > div span,
+    #recCount { font-size: 14px; }
+    .metric { text-align: center; }
+    .annualMetrics { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; }
+    .annualMetricsTitle { grid-column: 1 / -1; padding: 4px 2px 0; color: #1d1d1f; font-size: 18px; font-weight: 700; }
+    .metricGroup { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid #e7ebe8; }
+    .metricGroupTitle { padding: 16px 2px 6px; color: #6e6e73; font-size: 13px; font-weight: 700; }
+    .metricGroupTitle + .metricGroup { margin-bottom: 0; }
+    .metricGroup .metric strong { font-size: 25px; }
+    .annualMetricsTitle { display: none; }
+    .annualMetrics { grid-column: 1 / -1; grid-row: 1; }
+    .dailyTitle, .monthlyTitle { display: none; }
+    .dailyGroup, .monthlyGroup { grid-column: auto; grid-row: 2; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1px solid #e7ebe8; border-radius: 10px; overflow: hidden; }
+    .dailyGroup { grid-column: 1 / 4; }
+    .monthlyGroup { grid-column: 4 / 7; }
+    .dailyGroup .metric, .monthlyGroup .metric { border-right: 1px solid #e7ebe8; padding: 14px 12px; }
+    .dailyGroup .metric:last-child, .monthlyGroup .metric:last-child { border-right: 0; }
+    .dailyGroup .metric strong, .monthlyGroup .metric strong { font-size: 22px; }
+    .annualMetrics .metric { border-right: 1px solid #e7ebe8; padding: 20px 12px; }
+    .annualMetrics .metric { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 128px; }
+    .annualMetrics .metric:nth-child(4), .monthlyGroup .metric:last-child { border-right: 0; }
+    .latestInteraction .metricSubLabel { display: block; }
+    .latestInteraction .metricBreakdown { display: block; margin-top: 3px; }
+    @media (max-width:900px) { .annualMetrics { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    .filters button, .filters label, .filters select, .filters input { font-size: 14px; height: 36px; }
+    .tablePanel th { font-size: 14px; height: 48px; }
+    .tablePanel td { font-size: 14px; height: 56px; }
+    .tablePanel tbody td { height: 110px; }
+    .tablePanel footer { font-size: 14px; }
+    .tablePanel td:first-child { font-size: 14px; }
+    .videoCover { width: 76px; height: 100px; }
+    .videoCell { display: flex; align-items: center; gap: 14px; min-width: 520px; }
+    .videoTitle { display: block; max-width: 410px; font-size: 15px; line-height: 1.45; font-weight: 600; white-space: normal; }
+    .videoTitle.long { font-size: 13px; line-height: 1.35; }
+    .filterSeg { display: inline-flex; gap: 4px; padding: 3px; border: 1px solid #dfe8e2; border-radius: 10px; background: #f5f8f6; }
+    .filterSeg button { border: 0; border-radius: 7px; color: #6f7972; background: transparent; padding: 0 14px; transition: .15s ease; }
+    .filterSeg button:hover { color: #078c45; background: #e9f6ed; }
+    .filterSeg button.on { color: #fff; background: #5e6ad2; box-shadow: 0 2px 5px #5e6ad233; }
+    .cover { width: 80px; height: 48px; }
+    .thumb { width: 54px; height: 34px; }
+
+    /* Apple-inspired visual refinement */
+    :root { color: #1d1d1f; background: #f5f5f7; }
+    body { background: #f5f5f7; color: #1d1d1f; }
+    aside { background: rgba(250,250,252,.92); border-right-color: #e5e5e7; }
+    main, .page { background: #f5f5f7; }
+    header { background: rgba(255,255,255,.82); border-bottom-color: #e5e5e7; }
+    .panel, .metrics { background: rgba(255,255,255,.96); border-color: #e5e5e7; box-shadow: 0 8px 24px rgba(0,0,0,.045); }
+    .panelHead, th, td, .tablePanel footer { border-color: #ededf0; }
+    .panelHead h2, .contentHead h2 { color: #1d1d1f; letter-spacing: -.02em; }
+    .contentHead { background: rgba(255,255,255,.72); }
+    .filters { align-items: center; gap: 10px; }
+    .filterSeg { display: inline-flex; gap: 2px; padding: 3px; border: 1px solid #d9d9de; border-radius: 10px; background: #f1f1f3; }
+    .filterSeg button { min-width: 72px; height: 32px; padding: 0 13px; border: 0; border-radius: 7px; color: #6e6e73; background: transparent; font-size: 13px; }
+    .filterSeg button:hover { color: #1d1d1f; background: #fff; }
+    .filterSeg button.on { color: #1d1d1f; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.12); font-weight: 600; }
+    .searchField, .filters > label.searchField { display: inline-flex; align-items: center; gap: 8px; height: 38px; padding: 0 12px; border: 1px solid #d9d9de; border-radius: 10px; background: #fff; color: #6e6e73; box-shadow: 0 1px 2px rgba(0,0,0,.03); }
+    .searchField input, .filters > label.searchField input { width: 118px; height: 28px; padding: 0; border: 0; outline: 0; color: #1d1d1f; background: transparent; font-size: 13px; }
+    .searchField:focus-within { border-color: #8b8b91; box-shadow: 0 0 0 3px rgba(0,0,0,.07); }
+    .filters > label:not(.searchField) { height: 38px; border: 1px solid #d9d9de; border-radius: 10px; background: #fff; color: #6e6e73; }
+    .filters select { height: 28px; border: 0; outline: 0; background: transparent; color: #1d1d1f; font-size: 13px; }
+    .filters > label:not(.searchField) select { min-width: 110px; }
+    .tablePanel th { color: #6e6e73; background: #fafafa; font-weight: 600; }
+    .tablePanel td { color: #3a3a3c; }
+    .tablePanel td.green, .up { color: #5e6ad2; }
+    html, body { overflow-x: hidden; }
+    .grid { grid-template-columns: minmax(0,1fr) minmax(0,1.35fr); min-width: 0; }
+    .grid > .chart, .grid > .topVideos, .topVideos, .topVList, .topVCard { min-width: 0; }
+    .topVList { overflow-x: hidden; }
+    .topVCard { overflow: hidden; }
+    .topVInfo { min-width: 0; overflow: hidden; }
+    .topVTitle, .topVDate, .topVStats { min-width: 0; overflow: hidden; }
+    .videoCell { display: flex; align-items: center; gap: 14px; min-width: 520px; }
+    .videoTitle { display: block; min-width: 0; max-width: 430px; font-size: 15px; line-height: 1.4; font-weight: 600; white-space: normal; overflow-wrap: anywhere; }
+    .videoTitle.long { font-size: 13px; line-height: 1.32; }
+    @media (max-width:760px) {
+      .grid { display: block; width: 100%; }
+      .grid > .chart, .grid > .topVideos { width: 100%; }
+      .topVList { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; padding: 8px; }
+      .topVCard { gap: 6px; padding: 8px 6px; }
+      .topVRank { min-width: 16px; font-size: 16px; }
+      .topVCover { width: 48px; height: 66px; }
+      .topVStats { gap: 5px; }
+      .topVStat { font-size: 10px; }
+      .topVTotal { font-size: 13px; }
+      .videoCell { min-width: 300px; gap: 9px; }
+      .videoTitle { max-width: 260px; }
+      .videoTitle { font-size: 14px; }
+      .videoTitle.long { font-size: 12px; }
+    }
+    #sec-boost { margin-top: 16px; }
+    .boostSummary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 16px 18px; }
+    .boostKpi { padding: 16px; border: 1px solid #ededf0; border-radius: 12px; background: #fafafa; }
+    .boostKpi span { display: block; color: #6e6e73; font-size: 13px; }
+    .boostKpi strong { display: block; margin-top: 8px; color: #1d1d1f; font-size: 24px; }
+    .boostTable { min-width: 980px; }
+    .boostTable th, .boostTable td { height: 54px; padding: 0 16px; font-size: 13px; }
+    .boostTable td:first-child { max-width: 360px; white-space: normal; line-height: 1.4; }
+    .boostStatus { color: #248a54; }
+    .pager { display: inline-flex; align-items: center; gap: 6px; margin-left: auto; }
+    .pager button { min-width: 30px; height: 30px; padding: 0 9px; border: 1px solid #dedee3; border-radius: 8px; background: #fff; color: #6e6e73; font-size: 12px; }
+    .pager button.active { border-color: #5e6ad2; background: #5e6ad2; color: #fff; }
+    .pager button:disabled { opacity: .4; cursor: default; }
+    .boostFooter { display: flex; align-items: center; height: 58px; padding: 0 18px; color: #6e6e73; font-size: 13px; }
+    #sec-submissions { margin-top: 16px; }
+    .submissionPanel { overflow: hidden; }
+    .submissionHead { height: 72px; }
+    .submissionHead h2 { margin: 0; font-size: 20px; }
+    .submissionHead p { margin: 5px 0 0; color: #8a8a90; font-size: 12px; }
+    .submissionHeadRight { display: flex; align-items: center; gap: 12px; }
+    .submissionHeadRight > span { color: #6e6e73; font-size: 12px; }
+    .submissionLayout { display: grid; grid-template-columns: minmax(0,1.12fr) minmax(380px,.88fr); height: 390px; }
+    .zhejiangMapWrap { position: relative; min-width: 0; overflow: hidden; border-right: 1px solid #ededf0; background: #fff; }
+    .zhejiangMapWrap::before { content: ""; position: absolute; z-index: 0; inset: 10px; background: url('zhejiang-prefecture-map-clean.png') center / contain no-repeat; }
+    .mapGlow { display: none; }
+    .mapOutsidePatch { display: none; }
+    .zhejiangMap { position: relative; display: block; width: 100%; height: 100%; }
+    .mapMarker line { stroke: #8d94bd; stroke-width: 1; opacity: .65; }
+    .mapMarker circle { fill: rgba(94,106,210,.88); stroke: #fff; stroke-width: 3; filter: drop-shadow(0 4px 6px rgba(70,76,120,.22)); }
+    .mapMarker text { fill: #37394a; font-size: 12px; font-weight: 650; paint-order: stroke; stroke: rgba(255,255,255,.9); stroke-width: 4px; }
+    .mapMarker .mapValue { fill: #6d7187; font-size: 10px; font-weight: 500; }
+    .mapCaption { position: absolute; left: 18px; bottom: 15px; display: flex; flex-direction: column; gap: 3px; }
+    .mapCaption span { color: #33343c; font-size: 13px; font-weight: 650; }
+    .mapCaption small { color: #9999a1; font-size: 10px; }
+    .submissionSide { min-width: 0; padding: 16px 18px; background: rgba(255,255,255,.75); }
+    .submissionSideTitle { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+    .submissionSideTitle span { font-size: 13px; font-weight: 650; }
+    .submissionSideTitle small { color: #9a9aa1; font-size: 10px; }
+    .submissionList { display: grid; gap: 7px; }
+    .submissionRow { display: grid; grid-template-columns: 28px 1fr auto; align-items: center; min-height: 46px; padding: 7px 10px; border: 1px solid #eeeeF2; border-radius: 11px; background: #fafafd; }
+    .submissionRank { color: #a5a6ae; font-size: 12px; font-weight: 700; }
+    .submissionArea { color: #33343c; font-size: 13px; font-weight: 650; }
+    .submissionCounts { display: flex; gap: 10px; color: #777986; font-size: 11px; }
+    .submissionCounts b { color: #545bc5; font-size: 13px; }
+    .submissionModalCard { height: min(700px,86vh); }
+    .submissionModalCard .chartModalHead { height: 58px; }
+    .submissionModalCard .chartModalHead p { margin: 3px 0 0; color: #8c8c92; font-size: 12px; }
+    .submissionModalGrid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; max-height: calc(100% - 58px); overflow-y: auto; padding: 10px 3px 3px; }
+    .submissionModalItem { display: grid; grid-template-columns: 1fr auto auto; gap: 24px; align-items: center; min-height: 58px; padding: 0 16px; border: 1px solid rgba(222,222,228,.85); border-radius: 13px; background: rgba(250,250,252,.78); }
+    .submissionModalItem strong { font-size: 14px; }
+    .submissionModalItem span { color: #777986; font-size: 12px; }
+    .submissionModalItem b { color: #545bc5; font-size: 15px; }
+    .topVideosModalCard { height: min(780px, 88vh); }
+    .topVModalGrid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; max-height: calc(100% - 58px); overflow-y: auto; padding: 10px 3px 3px; }
+    .topVModalGrid .topVCard { min-height: 112px; }
+    @media (max-width:760px) { .boostSummary { grid-template-columns: 1fr; } }
+    @media (max-width:900px) { .submissionLayout { grid-template-columns: 1fr; height: auto; }.zhejiangMapWrap { border-right: 0; border-bottom: 1px solid #ededf0; }.submissionModalGrid, .topVModalGrid { grid-template-columns: 1fr; } }
+
+    /* Mobile dashboard: compact, touch-friendly, no horizontal layout spill */
+    @media (max-width:760px) {
+      body { background:#f5f5f7; padding-bottom:72px; }
+      aside { inset:auto 8px 8px; width:auto; height:62px; transform:none; border:1px solid rgba(220,220,225,.9); border-radius:18px; background:rgba(255,255,255,.9); box-shadow:0 10px 35px rgba(0,0,0,.13); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); }
+      aside .brand { display:none; }
+      aside nav { display:grid; grid-template-columns:repeat(4,1fr); height:100%; padding:5px; }
+      aside nav button { flex-direction:column; justify-content:center; gap:2px; height:50px; padding:0 4px; border-radius:13px; font-size:10px; text-align:center; }
+      aside nav button svg { width:18px; height:18px; }
+      aside nav button.selected { background:#f0f0ff; }
+      main { width:100%; margin:0; }
+      header { height:56px; padding:0 14px; }
+      .account { font-size:15px; }
+      .videoIcon { height:34px; max-width:116px; }
+      .actions { display:none; }
+      .page { padding:14px 12px 28px; }
+      .titleRow { margin-bottom:12px; }
+      .titleRow h1 { font-size:23px; letter-spacing:-.03em; }
+      .platformRail { width:100%; margin-bottom:12px; }
+      .platformRail a,.platformRail span { flex:1; padding:8px 10px; text-align:center; font-size:12px; }
+
+      .metrics { display:block; overflow:visible; border:0; border-radius:0; background:transparent; box-shadow:none; }
+      .annualMetrics { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin-bottom:10px; }
+      .annualMetrics .metric { min-width:0; min-height:112px; padding:15px 8px; border:1px solid #e5e5e9!important; border-radius:14px; background:#fff; box-shadow:0 5px 18px rgba(0,0,0,.035); }
+      .dailyGroup,.monthlyGroup { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); width:100%; margin-top:10px; border:1px solid #e5e5e9; border-radius:14px; background:#fff; box-shadow:0 5px 18px rgba(0,0,0,.03); }
+      .dailyGroup .metric,.monthlyGroup .metric { min-width:0; padding:13px 5px; border-right:1px solid #ececf0!important; }
+      .dailyGroup .metric:last-child,.monthlyGroup .metric:last-child { border-right:0!important; }
+      .metric>span { min-height:34px; font-size:11px; line-height:1.4; }
+      .metric strong,.annualMetrics .metric strong,.dailyGroup .metric strong,.monthlyGroup .metric strong { margin:5px 0; font-size:20px; line-height:1.15; }
+      .metric small { font-size:9px; line-height:1.35; white-space:normal; }
+      .latestInteraction .metricBreakdown { white-space:nowrap; }
+
+      .grid { display:block; }
+      .grid>.chart,.grid>.topVideos { width:100%; min-height:0; height:auto; }
+      .panel { margin-bottom:12px; border-radius:15px; box-shadow:0 5px 20px rgba(0,0,0,.035); }
+      .panelHead { min-height:54px; height:auto; padding:10px 13px; gap:8px; }
+      .panelHead h2,.contentHead h2,.submissionHead h2 { font-size:17px; }
+      .chartHeadActions { gap:6px; min-width:0; }
+      .chartHeadActions .seg { max-width:238px; overflow-x:auto; scrollbar-width:none; }
+      .chartHeadActions .seg::-webkit-scrollbar { display:none; }
+      .chartHeadActions .seg button { flex:none; padding:7px 9px; font-size:10px; }
+      .expandChartBtn { width:30px; height:30px; flex:none; }
+      .chartTabs { gap:22px; padding:10px 14px 0; font-size:12px; }
+      #trendChart { min-height:240px!important; height:240px!important; }
+      .topVList { display:grid; grid-template-columns:1fr; gap:8px; max-height:none; overflow:visible; padding:8px; }
+      .topVCard { min-height:104px; gap:8px; padding:8px; }
+      .topVCover { width:56px; height:76px; }
+      .topVTitle { font-size:12px; }
+      .topVStats { flex-wrap:wrap; gap:4px 8px; }
+      .topVTotal { font-size:14px; }
+
+      .submissionHeadRight>span { display:none; }
+      .submissionLayout { display:block; height:auto; }
+      .zhejiangMapWrap { height:290px; }
+      .submissionSide { padding:12px; }
+      .submissionList { gap:6px; }
+      .submissionRow { min-height:43px; padding:6px 9px; }
+      .submissionCounts { gap:5px; font-size:10px; }
+      .submissionCounts b { font-size:12px; }
+
+      .yearly { overflow:hidden; }
+      .yearly .panelHead { align-items:center; min-height:62px; padding:10px 13px; }
+      .yearly .panelHead>div { text-align:right; }
+      .yearly select { height:32px; max-width:110px; padding-right:22px; }
+      #yearChart { height:250px!important; }
+
+      .boostSummary { grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; padding:10px; }
+      .boostKpi { min-width:0; padding:11px 6px; text-align:center; border-radius:11px; }
+      .boostKpi span { min-height:30px; font-size:10px; }
+      .boostKpi strong { margin-top:4px; font-size:16px; white-space:nowrap; }
+
+      .tableWrap { overflow:visible; }
+      .boostTable,.tablePanel table { display:block; min-width:0; width:100%; }
+      .boostTable thead,.tablePanel table thead { display:none; }
+      .boostTable tbody,.tablePanel table tbody { display:grid; gap:8px; padding:8px; }
+      .boostTable tr,.tablePanel table tr { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:7px 10px; padding:12px; border:1px solid #e7e7eb; border-radius:14px; background:#fff; }
+      .boostTable td,.tablePanel table td { display:block; height:auto!important; min-width:0!important; max-width:none!important; padding:0; border:0; text-align:left!important; white-space:normal; font-size:12px; }
+      .boostTable td:first-child,.tablePanel table td:first-child { grid-column:1/-1; }
+      .boostTable td:not(:first-child)::before,.tablePanel table td:not(:first-child)::before { display:block; margin-bottom:2px; color:#92929a; font-size:9px; font-weight:500; }
+      .boostTable td:nth-child(2)::before { content:'投流次数'; }.boostTable td:nth-child(3)::before { content:'投流金额'; }.boostTable td:nth-child(4)::before { content:'播放数'; }.boostTable td:nth-child(5)::before { content:'完播率'; }
+      .tablePanel table td:nth-child(2)::before { content:'发布时间'; }.tablePanel table td:nth-child(3)::before { content:'完播率'; }.tablePanel table td:nth-child(4)::before { content:'平均时长'; }.tablePanel table td:nth-child(5)::before { content:'播放'; }.tablePanel table td:nth-child(6)::before { content:'推荐'; }.tablePanel table td:nth-child(7)::before { content:'喜欢'; }.tablePanel table td:nth-child(8)::before { content:'评论'; }.tablePanel table td:nth-child(9)::before { content:'分享'; }.tablePanel table td:nth-child(10)::before { content:'关注'; }.tablePanel table td:nth-child(11)::before { content:'转发'; }
+      .videoCell { min-width:0; width:100%; gap:10px; align-items:flex-start; }
+      .videoCover { width:64px; height:86px; margin:0; }
+      .videoTitle,.videoTitle.long { max-width:none; font-size:13px; line-height:1.45; }
+      .contentHead { min-height:58px; }
+      .contentHead+p.panelHead,.tablePanel>.panelHead:nth-child(2) { padding:9px!important; }
+      .filters { display:grid; grid-template-columns:1fr auto; width:100%; gap:7px; }
+      .filterSeg { grid-column:1/-1; display:grid; grid-template-columns:repeat(3,1fr); }
+      .filterSeg button { display:block!important; min-width:0; padding:0 5px; }
+      .searchField,.filters>label.searchField { width:100%; min-width:0; }
+      .searchField input,.filters>label.searchField input { width:100%; min-width:0; }
+      .filters>label:not(.searchField) { min-width:104px; padding:0 7px; }
+      .filters>label:not(.searchField) select { min-width:76px; max-width:82px; }
+      .tablePanel footer,.boostFooter { min-height:54px; height:auto; padding:9px 10px; gap:8px; flex-wrap:wrap; }
+      .pager { order:3; width:100%; justify-content:center; margin:0; overflow-x:auto; padding-bottom:2px; }
+      #exportBtn { margin-left:auto; }
+
+      .chartModal { padding:12px; }
+      .chartModalCard { width:100%; height:82vh; padding:12px; border-radius:18px; }
+      .topVModalGrid,.submissionModalGrid { grid-template-columns:1fr; }
+    }
+  </style>
+  <link rel="stylesheet" href="mobile-content-compact.css?v=20260821-7">
+</head>
+<body>
+<div class="app">
+  <aside>
+    <div class="brand"><img src="logo-wasu.png" alt="华数" class="brandLogo"><span class="brandText">浙江华数视频号<br>数据驾驶舱</span></div>
+    <nav>
+      <button class="selected" data-target="sec-overview">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+        数据总览
+      </button>
+      <button data-target="sec-year">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 3v18h18"/><path d="M7 14l3-4 3 3 4-6"/></svg>
+        年度播放
+      </button>
+      <button data-target="sec-boost">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M13 2L4 14h7l-1 8 9-12h-7l1-8z"/></svg>
+        投流情况
+      </button>
+      <button data-target="sec-content">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 3h18v18H3z"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg>
+        内容表现
+      </button>
+    </nav>
+  </aside>
+
+  <main>
+    <header>
+      <div class="account"><img src="logo-video.png" alt="" class="videoIcon">运营数据</div>
+    </header>
+
+    <div class="page">
+      <div class="titleRow"><div><h1>2026年数据总览</h1></div></div>
+      <div class="platformRail" aria-label="平台切换"><a class="active" href="index.html">视频号</a><a href="xiaohongshu.html">小红书</a><a href="douyin.html">抖音号</a><a href="wechat.html">公众号</a></div>
+
+      <div class="metrics" id="metrics"></div>
+
+      <section id="sec-overview">
+        <div class="grid">
+          <!-- 播放趋势 -->
+          <div class="panel chart">
+            <div class="panelHead">
+              <h2>播放趋势</h2>
+              <div class="chartHeadActions"><div class="seg" id="trendSeg">
+                <button data-r="30">近30天</button>
+                <button class="on" data-r="ytd">年初至今</button>
+                <button data-r="all">总览</button>
+              </div><button class="expandChartBtn" id="expandChartBtn" title="放大播放趋势"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M21 16v5h-5"/></svg></button></div>
+            </div>
+            <div class="chartTabs" id="trendTabs">
+              <span class="activeTab" data-m="plays">播放量</span>
+              <span data-m="inter">互动量</span>
+              <span data-m="follows">新增关注</span>
+            </div>
+            <div id="trendChart" style="width:100%;flex:1;min-height:260px"></div>
+          </div>
+
+          <!-- 近一年互动 TOP 视频（延伸至右侧整列） -->
+          <div class="panel topVideos">
+            <div class="panelHead"><h2>数据 TOP 视频</h2><div class="panelHeadRight"><button class="expandChartBtn" id="expandTopVideosBtn" title="查看全部数据 TOP 视频"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M21 16v5h-5"/></svg></button></div></div>
+            <div class="topVList" id="topVList"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="sec-submissions">
+        <div class="panel submissionPanel">
+          <div class="panelHead submissionHead">
+            <div><h2>地市投稿</h2></div>
+            <div class="submissionHeadRight"><span id="submissionSummary"></span><button class="expandChartBtn" id="expandSubmissionBtn" title="查看全部地市投稿"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M21 16v5h-5"/></svg></button></div>
+          </div>
+          <div class="submissionLayout">
+            <div class="zhejiangMapWrap">
+              <div class="mapGlow"></div>
+              <svg class="zhejiangMap" viewBox="0 0 520 350" role="img" aria-label="浙江省地级市行政区投稿分布图">
+                <defs><linearGradient id="mapFill" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f4f3fb"/><stop offset="1" stop-color="#dfe1f1"/></linearGradient><filter id="mapShadow"><feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="#51587f" flood-opacity=".16"/></filter></defs>
+                <g id="mapMarkers"></g>
+              </svg>
+            </div>
+            <div class="submissionSide"><div class="submissionSideTitle"><span>投稿活跃业务区</span><small>按投稿次数排序</small></div><div id="submissionList" class="submissionList"></div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 年度月度播放 -->
+      <section id="sec-year">
+        <div class="panel yearly">
+          <div class="panelHead">
+            <h2>年度播放趋势</h2>
+            <div>
+              <p id="yearSub"></p>
+              <select id="yearSel">
+                <option value="contrast" selected>两年对比</option>
+                <option value="2026">2026 年</option>
+                <option value="2025">2025 年</option>
+              </select>
+            </div>
+          </div>
+          <div id="yearChart" style="width:100%;height:300px"></div>
+        </div>
+      </section>
+
+      <section id="sec-boost">
+        <div class="panel boostPanel">
+          <div class="panelHead contentHead"><div><h2>投流情况</h2><p id="boostNote"></p></div></div>
+          <div class="boostSummary" id="boostSummary"></div>
+          <div class="tableWrap"><table class="boostTable"><thead><tr><th>投流内容</th><th>投流次数</th><th>投流金额</th><th>播放数</th><th>完播率</th></tr></thead><tbody id="boostBody"></tbody></table></div><footer class="boostFooter"><span id="boostCount"></span><span class="pager" id="boostPager"></span></footer>
+        </div>
+      </section>
+
+      <!-- 内容表现 -->
+      <section id="sec-content">
+        <div class="panel tablePanel full">
+          <div class="panelHead contentHead">
+            <h2>内容表现</h2>
+            <p id="contentNote"></p>
+          </div>
+          <div class="panelHead" style="border-bottom:1px solid #edf0ee;height:auto;padding:12px 16px">
+            <div class="filters">
+              <div class="seg" id="filterSeg">
+                <button class="on" data-f="all">全部时间</button>
+                <button data-f="30">近30天</button>
+                <button data-f="month">本月</button>
+              </div>
+              <label class="searchField">搜索 <input id="searchInput" placeholder="内容关键词"></label>
+              <label>排序
+                <select id="sortSel">
+                  <option value="timeDesc">时间降序</option>
+                  <option value="timeAsc">时间升序</option>
+                  <option value="playDesc">播放量降序</option>
+                  <option value="playAsc">播放量升序</option>
+                </select>
+              </label>
+            </div>
+          </div>
+          <div class="tableWrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>内容</th><th>发布时间</th><th>完播率</th><th>平均播放时长</th>
+                  <th>播放</th><th>推荐</th><th>喜欢</th><th>评论</th><th>分享</th><th>关注</th><th>转发</th>
+                </tr>
+              </thead>
+              <tbody id="tbody"></tbody>
+            </table>
+          </div>
+          <footer>
+            <span id="recCount"></span><span class="pager" id="contentPager"></span>
+            <button id="exportBtn">
+              下载 CSV
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3v12m0 0l4-4m-4 4l-4-4M5 21h14"/></svg>
+            </button>
+          </footer>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<div class="chartModal" id="chartModal" aria-hidden="true">
+  <div class="chartModalCard">
+    <div class="chartModalHead"><h2>播放趋势</h2><button class="closeChartBtn" id="closeChartBtn" aria-label="关闭">×</button></div>
+    <div id="yearChartModal"></div>
+  </div>
+</div>
+
+<div class="chartModal" id="submissionModal" aria-hidden="true">
+  <div class="chartModalCard submissionModalCard">
+    <div class="chartModalHead"><div><h2>地市投稿统计 · 全部业务区</h2><p>投稿 50 次 · 录用发布 23 次</p></div><button class="closeChartBtn" id="closeSubmissionBtn" aria-label="关闭">×</button></div>
+    <div class="submissionModalGrid" id="submissionModalGrid"></div>
+  </div>
+</div>
+<div class="chartModal" id="topVideosModal" aria-hidden="true">
+  <div class="chartModalCard topVideosModalCard">
+    <div class="chartModalHead"><div><h2>数据 TOP 视频 · 全部20条</h2><p>按播放量降序排列</p></div><button class="closeChartBtn" id="closeTopVideosBtn" aria-label="关闭">×</button></div>
+    <div class="topVModalGrid" id="topVModalGrid"></div>
+  </div>
+</div>
+
+<script src="echarts.min.js"></script>
+<script src="submissions.js"></script>
+<script src="app.js?v=20260901-data1"></script>
+<script src="platform-nav-scroll.js?v=20260821-7"></script>
+</body>
+</html>
